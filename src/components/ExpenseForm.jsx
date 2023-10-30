@@ -1,67 +1,119 @@
 // components/ExpenseForm.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { db } from '../firebase'
+import { addDoc, doc, collection, getDoc, updateDoc } from 'firebase/firestore';
+import { useNavigate, useParams } from 'react-router-dom';
 
-function ExpenseForm({ addExpense, editingExpense, setEditingExpense, expenses, setExpenses }) {
-  const [name, setName] = useState('');
-  const [amount, setAmount] = useState(0);
-  const [category, setCategory] = useState('Food');
-  const [subCategory, setSubCategoryState] = useState('Breakfast');
-  const [card, setCard] = useState('UOB');
+function ExpenseForm({ editingExpense, setEditingExpense }) {
 
+  // constants for ids and editing
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  // functions to update if editing
+
+  useEffect(() => {
+    if (id) {
+      const fetchExpense = async () => {
+        const expenseDoc = await getDoc(doc(db, "expenses", id));
+        if (expenseDoc.exists()) {
+            setExpense(expenseDoc.data())
+        }
+      };
+      fetchExpense();
+    }
+  }, [id])
+
+  // constants for categories and subcategories
+  const defaultExpense = { name: 'Both', description: '', amount: 0, category: 'Food', subCategory: 'Breakfast', card: 'UOB' }
+  const [expense, setExpense] = useState(defaultExpense);
   const subCategories = {
     Food: ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Drinks'],
     Shopping: ['Clothing', 'Electronics', 'Groceries', 'Accessories', 'Home & Living'],
     Travel: ['Transportation', 'Accommodation', 'Tours & Activities', 'Dining Out', 'Souvenirs']
   };
 
-  const handleSubmit = e => {
+
+  // function to update category and subcategories
+  const handeInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === 'category') {
+      let defaultSubcategory = '';
+  
+      switch(value) {
+        case 'Food':
+          defaultSubcategory = 'Breakfast';
+          break;
+        case 'Shopping':
+          defaultSubcategory = 'Clothing'; // assuming 'clothing' as a subcategory for Shopping
+          break;
+        case 'Travel':
+          defaultSubcategory = 'Transportation'; // assuming 'flight' as a subcategory for Travel
+          break;
+        default:
+          break;
+      }
+  
+      setExpense(prevExpense => ({
+        ...prevExpense,
+        [name]: value,
+        subcategory: defaultSubcategory
+      }));
+    } else {
+    setExpense(prevExpense => ({ ...prevExpense, [name]: value }));
+  };}
+
+  // Function for submitting the form and updating the database
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
       // Check for a positive amount
-    if (parseFloat(amount) <= 0 || isNaN(parseFloat(amount))) {
+    if (parseFloat(expense.amount) <= 0 || isNaN(parseFloat(expense.amount))) {
       alert("Error: Please enter a positive amount.");
       return;
     }
 
-    if (editingExpense) {
-      const updatedExpenses = expenses.map(exp => {
-        if (exp === editingExpense) {
-          return {name, amount: parseFloat(amount), category, subCategory, card};
-        }
-        return exp;
-      });
-      setExpenses(updatedExpenses);
-      setEditingExpense(null);
+    if (id) {
+      await updateDoc(doc(db, "expenses", id), expense);
+      navigate('/')
+      alert("Expense updated!")
+      setExpense(defaultExpense)
     } else {
-
-    addExpense({ name, amount: parseFloat(amount) || 0 , category, subCategory, card});
-    setName('');
-    setAmount('');
-    setCategory('Food');
-    setSubCategoryState('Breakfast');
-    setCard('PayNow');
+      
+    const docRef = await addDoc(collection(db, "expenses"), expense);
+    alert("Expense added!") 
+    setExpense(defaultExpense)
+  }
     }
-  };
-
-  useEffect(() => {
-    // Reset subcategory when main category changes
-    setSubCategoryState(subCategories[category][0]);
-  }, [category]);
 
   return (
     <form onSubmit={handleSubmit}>
       <div>
+        <h1>
+        {id ? 'Editing Previous Expense' : 'New Expense'}
+        </h1>
+      </div>
+      <div>
         <label>Name: </label>
-        <input value={name} onChange={e => setName(e.target.value)} required />
+        <select value={expense.name} name="name" onChange={handeInputChange} required>
+          <option value="Zach">Zach</option>
+          <option value="Faith">Faith</option>
+          <option value="Both">Both</option>
+        </select>
+      </div>
+      <div>
+        <label>Description: </label>
+        <input value={expense.description} name="description" onChange={handeInputChange} />
       </div>
       <div>
         <label>Amount: </label>
-        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} required />
+        <input type="number" name="amount" value={expense.amount} onChange={handeInputChange} required />
       </div>
       <div>
         <label>Expense Category: </label>
-        <select value={category} onChange={e => setCategory(e.target.value)}>
+        <select value={expense.category} name="category" onChange={handeInputChange}>
           <option value="Food">Food</option>
           <option value="Shopping">Shopping</option>
           <option value="Travel">Travel</option>
@@ -69,20 +121,20 @@ function ExpenseForm({ addExpense, editingExpense, setEditingExpense, expenses, 
       </div>
       <div>
         <label>Subcategory: </label>
-        <select value={subCategory} onChange={e => setSubCategoryState(e.target.value)}>
-          {subCategories[category] && subCategories[category].map(sub => <option key={sub} value={sub}>{sub}</option>)}
+        <select value={expense.subCategory} name="subcategory" onChange={handeInputChange}>
+          {subCategories[expense.category] && subCategories[expense.category].map(sub => <option key={sub} value={sub}>{sub}</option>)}
         </select>
       </div>
       <div>
         <label>Card Used: </label>
-        <select value={card} onChange={e => setCard(e.target.value)}>
+        <select value={expense.card} name="card" onChange={handeInputChange}>
           <option value="UOB">UOB</option>
           <option value="OCBC">OCBC</option>
           <option value="Citibank">Citibank</option>
           <option value="PayNow">PayNow</option>
         </select>
       </div>
-      <button type="submit">{editingExpense ? 'Edit' : 'Add Expense'}</button>
+      <button type="submit">{id ? 'Edit' : 'Add Expense'}</button>
     </form>
   );
 }
