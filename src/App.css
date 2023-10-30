@@ -57,3 +57,8 @@ button:hover {
 .menu.open {
   display: block;
 }
+
+.responsive-table-container {
+  overflow-x: auto;
+  max-width: 100%;
+}

@@ -5,7 +5,9 @@ import { db } from '../firebase'
 import { addDoc, doc, collection, getDoc, updateDoc } from 'firebase/firestore';
 import { useNavigate, useParams } from 'react-router-dom';
 
-function ExpenseForm({ editingExpense, setEditingExpense }) {
+import { categories, subCategories } from './categories';
+
+function ExpenseForm() {
 
   // constants for ids and editing
   const { id } = useParams();
@@ -26,15 +28,18 @@ function ExpenseForm({ editingExpense, setEditingExpense }) {
   }, [id])
 
   // constants for categories and subcategories
-  const defaultExpense = { name: 'Both', description: '', amount: 0, category: 'Food', subCategory: 'Breakfast', card: 'UOB' }
+  const defaultExpense = { name: 'Both', 
+  
+  datetime: (() => {
+    const current = new Date();
+    const date = current.toISOString().slice(0, 10);  // gets YYYY-MM-DD
+    const time = current.toTimeString().slice(0, 5);  // gets HH:MM
+    return `${date}T${time}`;
+})(), 
+  description: '', amount: 0, category: 'Food', subCategory: 'Breakfast', card: 'UOB' }
+
   const [expense, setExpense] = useState(defaultExpense);
-  const subCategories = {
-    Food: ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Drinks'],
-    Shopping: ['Clothing', 'Electronics', 'Groceries', 'Accessories', 'Home & Living'],
-    Travel: ['Transportation', 'Accommodation', 'Tours & Activities', 'Dining Out', 'Souvenirs']
-  };
-
-
+  
   // function to update category and subcategories
   const handeInputChange = (e) => {
     const { name, value } = e.target;
@@ -59,7 +64,7 @@ function ExpenseForm({ editingExpense, setEditingExpense }) {
       setExpense(prevExpense => ({
         ...prevExpense,
         [name]: value,
-        subcategory: defaultSubcategory
+        subCategory: defaultSubcategory
       }));
     } else {
     setExpense(prevExpense => ({ ...prevExpense, [name]: value }));
@@ -68,6 +73,8 @@ function ExpenseForm({ editingExpense, setEditingExpense }) {
   // Function for submitting the form and updating the database
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log(expense.datetime)
 
       // Check for a positive amount
     if (parseFloat(expense.amount) <= 0 || isNaN(parseFloat(expense.amount))) {
@@ -104,6 +111,10 @@ function ExpenseForm({ editingExpense, setEditingExpense }) {
         </select>
       </div>
       <div>
+        <label> Date and Time: </label>
+        <input type="datetime-local" name="datetime" value={expense.datetime} onChange={handeInputChange} />
+      </div>
+      <div>
         <label>Description: </label>
         <input value={expense.description} name="description" onChange={handeInputChange} />
       </div>
@@ -114,14 +125,12 @@ function ExpenseForm({ editingExpense, setEditingExpense }) {
       <div>
         <label>Expense Category: </label>
         <select value={expense.category} name="category" onChange={handeInputChange}>
-          <option value="Food">Food</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Travel">Travel</option>
+          {categories.map(cat => <option value={cat}> {cat} </option>)}
         </select>
       </div>
       <div>
         <label>Subcategory: </label>
-        <select value={expense.subCategory} name="subcategory" onChange={handeInputChange}>
+        <select value={expense.subCategory} name="subCategory" onChange={handeInputChange}>
           {subCategories[expense.category] && subCategories[expense.category].map(sub => <option key={sub} value={sub}>{sub}</option>)}
         </select>
       </div>
