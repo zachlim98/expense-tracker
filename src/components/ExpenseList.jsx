@@ -56,6 +56,15 @@ function ExpenseList({ setEditingExpense }) {
     return `${day}/${month}/${year}`;
   }
 
+  // function to render card used
+  function formatcard(card) {
+    const splitcard = card.split(":");
+    if (splitcard.length > 1) {
+      return splitcard[1];
+    }
+    return null;
+  }
+
   // function to create filtering system
   const handleMonthChange = (e) => {
     setSelectedMonth(e);
@@ -110,7 +119,7 @@ function ExpenseList({ setEditingExpense }) {
                 <TableCell>{expense.category}</TableCell>
                 <TableCell>{expense.subCategory}</TableCell>
                 <TableCell>{expense.amount}</TableCell>
-                <TableCell>{expense.card}</TableCell>
+                <TableCell>{formatcard(expense.card)}</TableCell>
                 <TableCell>
                   <button onClick={() => handleEdit(expense.id)}>Edit</button>
                 </TableCell>

@@ -1,9 +1,11 @@
 import {
+  Box,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -20,16 +22,24 @@ function CardTotalsPage() {
         ...doc.data(),
         id: doc.id,
       }));
-      console.log(fetchedExpenses);
       setCardTotal(fetchedExpenses);
     };
 
     fetchCard();
   }, []);
 
+  const zachCards = cardTotal.filter(
+    (card) => card.id.split(":")[0] === "Zach"
+  );
+  const faithCards = cardTotal.filter(
+    (card) => card.id.split(":")[0] === "Faith"
+  );
+
   return (
-    <div>
-      <h2>Total Card Expenses</h2>
+    <Box>
+      <Typography variant="h5"> Card Usage for the Cycle </Typography>
+      <br></br>
+      <Typography variant="h6">Faith's Cards</Typography>
       <Table>
         <TableHead>
           <TableRow>
@@ -40,9 +50,9 @@ function CardTotalsPage() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {cardTotal.map((total) => (
+          {faithCards.map((total) => (
             <TableRow key={total.id}>
-              <TableCell>{total.id}</TableCell>
+              <TableCell>{total.id.split(":")[1]}</TableCell>
               {/* <TableCell>{total.startDate}</TableCell>
             <TableCell>{total.endDate}</TableCell> */}
               <TableCell>${total.total.toFixed(2)}</TableCell>
@@ -50,7 +60,29 @@ function CardTotalsPage() {
           ))}
         </TableBody>
       </Table>
-    </div>
+      <br></br>
+      <Typography variant="h6">Zach's Cards</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Card Name</TableCell>
+            {/* <TableCell>Start Date</TableCell>
+          <TableCell>End Date</TableCell> */}
+            <TableCell>Total Amount</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {zachCards.map((total) => (
+            <TableRow key={total.id}>
+              <TableCell>{total.id.split(":")[1]}</TableCell>
+              {/* <TableCell>{total.startDate}</TableCell>
+            <TableCell>{total.endDate}</TableCell> */}
+              <TableCell>${total.total.toFixed(2)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Box>
   );
 }
 

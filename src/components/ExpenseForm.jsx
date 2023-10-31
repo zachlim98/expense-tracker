@@ -7,17 +7,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   TextField,
-  Select,
   MenuItem,
   FormControl,
-  InputLabel,
   Box,
   InputAdornment,
 } from "@mui/material";
 
-import { categories, subCategories } from "./Misc/categories";
+import { categories, subCategories, cards } from "./Misc/categories";
 import { AlertSnackbar } from "./Misc/SnackBar";
-import { getFunctions, httpsCallable } from "firebase/functions";
 
 function ExpenseForm() {
   // constants for ids and editing
@@ -47,7 +44,7 @@ function ExpenseForm() {
 
   // constants for categories and subcategories
   const defaultExpense = {
-    name: "Both",
+    name: "Faith",
 
     datetime: (() => {
       const current = new Date();
@@ -78,6 +75,16 @@ function ExpenseForm() {
         ...prevExpense,
         [name]: value,
         subCategory: defaultSubcategory,
+      }));
+    } else if (name === "name") {
+      let defaultCard = "";
+
+      switch (value) {
+      }
+      setExpense((prevExpense) => ({
+        ...prevExpense,
+        [name]: value,
+        card: defaultCard,
       }));
     } else {
       setExpense((prevExpense) => ({ ...prevExpense, [name]: value }));
@@ -133,7 +140,6 @@ function ExpenseForm() {
           >
             <MenuItem value="Zach">Zach</MenuItem>
             <MenuItem value="Faith">Faith</MenuItem>
-            <MenuItem value="Both">Both</MenuItem>
           </TextField>
         </FormControl>
         <FormControl fullWidth sx={{ padding: "0 16px" }}>
@@ -206,10 +212,12 @@ function ExpenseForm() {
             onChange={handeInputChange}
             label="Card:"
           >
-            <MenuItem value="UOB">UOB</MenuItem>
-            <MenuItem value="OCBC">OCBC</MenuItem>
-            <MenuItem value="Citibank">Citibank</MenuItem>
-            <MenuItem value="PayNow">PayNow</MenuItem>
+            {cards[expense.name] &&
+              cards[expense.name].map((card) => (
+                <MenuItem key={card} value={expense.name + ":" + card}>
+                  {card}
+                </MenuItem>
+              ))}
           </TextField>
         </FormControl>
         <Button variant="contained" color="primary" type="submit">

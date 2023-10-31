@@ -18,7 +18,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 function App() {
   const [expenses, setExpenses] = useState([]);
   const [editingExpense, setEditingExpense] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>

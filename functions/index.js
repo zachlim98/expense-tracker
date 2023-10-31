@@ -19,6 +19,24 @@ exports.updateCardTotalOnNewExpense = functions.firestore
     });
   });
 
+// Function that updates the total for each card if we need to update some value
+exports.updateCardTotalOnExpenseEdit = functions.firestore
+  .document("expenses/{expenseId}")
+  .onUpdate(async (change, context) => {
+    const previousExpense = change.before.data();
+    const updatedExpense = change.after.data();
+
+    const cardName = updatedExpense.card;
+    const difference = updatedExpense.amount - previousExpense.amount;
+
+    const cardTotalsRef = admin.firestore().collection("cardTotals");
+    const cardTotalDoc = cardTotalsRef.doc(cardName);
+
+    return cardTotalDoc.update({
+      total: admin.firestore.FieldValue.increment(difference),
+    });
+  });
+
 // Function that resets the totals. It is checked at the end of every day
 exports.resetCardTotals = functions.pubsub
   .schedule("0 0 * * *")
@@ -29,8 +47,11 @@ exports.resetCardTotals = functions.pubsub
 
     // Define the cards and their reset dates
     const cardResetDates = {
-      UOB: 2,
-      OCBC: 5,
+      "Zach:UOB": 1,
+      "Zach:OCBC": 1,
+      "Zach:Citibank": 20,
+      "Faith:UOB": 4,
+      "Faith:HSBC": 1,
       // ... other cards and their reset dates
     };
 
