@@ -1,13 +1,12 @@
 // App.js
 
-import React, { useState } from "react";
+import React from "react";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseList from "./components/ExpenseList";
 import CardUsage from "./components/CardUsage";
 import "@mui/material/styles";
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { db } from "./firebase";
 import { HamburgerMenu } from "./components/Misc/hamburger";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 
@@ -16,9 +15,6 @@ import theme from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
 
 function App() {
-  const [expenses, setExpenses] = useState([]);
-  const [editingExpense, setEditingExpense] = useState(null);
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -35,37 +31,13 @@ function App() {
 
           {/* Routes */}
           <Routes>
-            <Route
-              path="/addexpense"
-              element={
-                <ExpenseForm
-                  editingExpense={editingExpense}
-                  setEditingExpense={setEditingExpense}
-                />
-              }
-            />
+            <Route path="/addexpense" element={<ExpenseForm />} />
 
-            <Route
-              path="/expenselist"
-              element={
-                <ExpenseList
-                  expenses={expenses}
-                  setEditingExpense={setEditingExpense}
-                />
-              }
-            />
+            <Route path="/expenselist" element={<ExpenseList />} />
 
             <Route path="/cardusage" element={<CardUsage />} />
 
-            <Route
-              path="edit/:id"
-              element={
-                <ExpenseForm
-                  editingExpense={editingExpense}
-                  setEditingExpense={setEditingExpense}
-                />
-              }
-            />
+            <Route path="edit/:id" element={<ExpenseForm />} />
           </Routes>
         </div>
       </Router>

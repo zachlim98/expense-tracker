@@ -109,7 +109,7 @@ function ExpenseForm() {
       setExpense(defaultExpense);
       navigate("/addexpense");
     } else {
-      const docRef = await addDoc(collection(db, "expenses"), expense);
+      await addDoc(collection(db, "expenses"), expense);
       setAlertMessage("New expense added!");
       setAlertOpen(true);
       setExpense(defaultExpense);
