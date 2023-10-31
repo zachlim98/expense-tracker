@@ -6,11 +6,12 @@ Having wanted to learn React for awhile now, I hence took the plunge to do a 2D1
 
 ### Features
 
-> Multiple users able to input
-> Able to filter entries and edit
-> **Able to track how much is being used on each card as per _billing cycles_**
+>
+- Multiple users able to input
+- Able to filter entries and edit
+- **Able to track how much is being used on each card as per _billing cycles_**
 
-### Setup
-
-> Frontend: Netlify
-> Backend: Firebase Functions + Firestore Database
+### Architecture
+>
+- Frontend: Netlify
+- Backend: Firebase Functions + Firestore Database
