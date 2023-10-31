@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { collection, getDocs } from "firebase/firestore"; // Import the required functions
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore"; // Import the required functions
 import { useNavigate } from "react-router-dom";
 import {
   Paper,
@@ -14,8 +14,11 @@ import {
   TextField,
   MenuItem,
   TableBody,
+  Button,
+  Box,
 } from "@mui/material";
 import { months } from "./Misc/categories";
+import { AlertSnackbar } from "./Misc/SnackBar";
 
 function ExpenseList({ setEditingExpense }) {
   const navigate = useNavigate();
@@ -24,6 +27,18 @@ function ExpenseList({ setEditingExpense }) {
 
   const handleEdit = (id) => {
     navigate(`/edit/${id}`);
+  };
+
+  // function that deletes expenses
+  const handleDelete = async (expenseId) => {
+    // Delete from Firestore
+    await deleteDoc(doc(db, "expenses", expenseId));
+    setAlertMessage("Sucessfully deleted!");
+    setAlertOpen(true);
+
+    setDisplayExp((prevExpenses) =>
+      prevExpenses.filter((displayExp) => displayExp.id !== expenseId)
+    );
   };
 
   // functions to fetch the data and then sort by date
@@ -70,6 +85,14 @@ function ExpenseList({ setEditingExpense }) {
     setSelectedMonth(e);
   };
 
+  // functions for alert
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+  };
+
   const filteredExpenses = sortedExpenses.filter((expense) => {
     if (!selectedMonth) return true; // if no month is selected, show all expenses
     // Extract the month from the expense's date
@@ -78,7 +101,12 @@ function ExpenseList({ setEditingExpense }) {
   });
 
   return (
-    <div>
+    <Box>
+      <AlertSnackbar
+        open={alertOpen}
+        message={alertMessage}
+        onClose={handleAlertClose}
+      />
       <h2>Expenses</h2>
       <TextField
         select
@@ -108,7 +136,8 @@ function ExpenseList({ setEditingExpense }) {
               <TableCell>Subcategory</TableCell>
               <TableCell>Amount</TableCell>
               <TableCell>Card Used</TableCell>
-              <TableCell>Edit</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -121,14 +150,27 @@ function ExpenseList({ setEditingExpense }) {
                 <TableCell>{expense.amount}</TableCell>
                 <TableCell>{formatcard(expense.card)}</TableCell>
                 <TableCell>
-                  <button onClick={() => handleEdit(expense.id)}>Edit</button>
+                  <Button
+                    color="primary"
+                    onClick={() => handleEdit(expense.id)}
+                  >
+                    Edit
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    color="secondary"
+                    onClick={() => handleDelete(expense.id)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Box>
   );
 }
 

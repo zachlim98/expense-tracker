@@ -4,6 +4,7 @@ import React from "react";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseList from "./components/ExpenseList";
 import CardUsage from "./components/CardUsage";
+import SimpleCharts from "./components/Overview";
 import "@mui/material/styles";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
@@ -39,7 +40,11 @@ function App() {
 
             <Route path="/cardusage" element={<CardUsage />} />
 
+            <Route path="/overview" element={<SimpleCharts />} />
+
             <Route path="edit/:id" element={<ExpenseForm />} />
+
+            <Route path="/overview" element={<SimpleCharts />} />
           </Routes>
         </div>
       </Router>

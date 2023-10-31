@@ -38,15 +38,17 @@ export const HamburgerMenu = () => {
           onKeyDown={toggleDrawer(false)}
         >
           <List>
-            {["Add Expense", "Expense List", "Card Usage"].map((text) => (
-              <ListItemButton
-                key={text}
-                component={Link}
-                to={`/${text.replace(" ", "").toLowerCase()}`}
-              >
-                <ListItemText primary={text} />
-              </ListItemButton>
-            ))}
+            {["Add Expense", "Expense List", "Card Usage", "Overview"].map(
+              (text) => (
+                <ListItemButton
+                  key={text}
+                  component={Link}
+                  to={`/${text.replace(" ", "").toLowerCase()}`}
+                >
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              )
+            )}
           </List>
         </div>
       </Drawer>

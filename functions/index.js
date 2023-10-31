@@ -37,6 +37,23 @@ exports.updateCardTotalOnExpenseEdit = functions.firestore
     });
   });
 
+// Function that handles the deleting of an entry
+exports.updateCardTotalOnExpenseDelete = functions.firestore
+  .document("expenses/{expenseId}")
+  .onDelete(async (snapshot, context) => {
+    const deletedExpense = snapshot.data();
+    const cardName = deletedExpense.card;
+    const amount = deletedExpense.amount;
+
+    const cardTotalsRef = admin.firestore().collection("cardTotals");
+    const cardTotalDoc = cardTotalsRef.doc(cardName);
+
+    // Decrease the total for this card by the deleted amount
+    return cardTotalDoc.update({
+      total: admin.firestore.FieldValue.increment(-parseFloat(amount)),
+    });
+  });
+
 // Function that resets the totals. It is checked at the end of every day
 exports.resetCardTotals = functions.pubsub
   .schedule("0 0 * * *")
