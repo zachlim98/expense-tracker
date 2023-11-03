@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const moment = require("moment-timezone");
 admin.initializeApp();
 
 // Function that updates the card totals every time we add a new expense
@@ -72,7 +73,7 @@ exports.resetCardTotals = functions.pubsub
       // ... other cards and their reset dates
     };
 
-    const today = new Date().getDate();
+    const today = moment().tz("Asia/Singapore").date(); // This will give you the day of the month in Singapore's timezone
 
     for (const [cardName, resetDay] of Object.entries(cardResetDates)) {
       if (today === resetDay) {
